@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: nginx-php
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx:1.17-alpine
+        name: nginx
+        volumeMounts:
+        - name: app
+          mountPath: /var/www/html
+        - name: config
+          mountPath: /etc/nginx/conf.d          
+        ports:
+        - name: nginx
+          containerPort: 80
+          protocol: TCP
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      volumes:
+        - name: app
+          persistentVolumeClaim:
+            claimName: app
+        - name: config
+          configMap:
+            name: nginx-config
+            items:
+            - key: config
+              path: site.conf

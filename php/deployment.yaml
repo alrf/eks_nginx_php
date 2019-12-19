@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: php
+  namespace: nginx-php
+  labels:
+    app: php
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: php
+  template:
+    metadata:
+      labels:
+        app: php
+    spec:
+      containers:
+      - image: alrf/php:7.4-fpm-alpine
+        name: php
+        volumeMounts:
+        - name: app
+          mountPath: /var/www/html
+        ports:
+        - name: php
+          containerPort: 9000
+          protocol: TCP
+        imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "cp -r /app/. /var/www/html"]        
+      restartPolicy: Always
+      volumes:
+        - name: app
+          persistentVolumeClaim:
+            claimName: app

@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: php
+  namespace: nginx-php
+spec:
+  selector:
+    app: php
+  ports:
+  - protocol: TCP
+    port: 9000
+    targetPort: 9000
